@@ -102,6 +102,21 @@ INT DoNotepadFont(BOOL bSetup)
     return 0;
 }
 
+INT DoInstallFonts(BOOL bInstall)
+{
+    if (bInstall)
+    {
+        AddFontResourceW(L"msgothic.ttc");
+        AddFontResourceW(L"msmincho.ttc");
+    }
+    else
+    {
+        RemoveFontResourceW(L"msgothic.ttc");
+        RemoveFontResourceW(L"msmincho.ttc");
+    }
+    return 0;
+}
+
 BOOL EnableProcessPriviledge(LPCTSTR pszSE_)
 {
     BOOL f;
@@ -145,12 +160,14 @@ WinMain(HINSTANCE   hInstance,
     if (lstrcmpiA(lpCmdLine, "-i") == 0)
     {
         // install
+        DoInstallFonts(TRUE);
         DoSetupSubst(JPN_MapForInstall, ARRAYSIZE(JPN_MapForInstall));
         DoNotepadFont(TRUE);
     }
     else if (lstrcmpiA(lpCmdLine, "-u") == 0)
     {
         // uninstall
+        DoInstallFonts(FALSE);
         DoSetupSubst(JPN_MapForUninstall, ARRAYSIZE(JPN_MapForUninstall));
         DoNotepadFont(FALSE);
     }
@@ -159,11 +176,5 @@ WinMain(HINSTANCE   hInstance,
         return -1;
     }
 
-    if (MessageBox(NULL, LoadStringDx(100), LoadStringDx(101),
-                   MB_ICONQUESTION | MB_YESNO) == IDYES)
-    {
-        EnableProcessPriviledge(SE_SHUTDOWN_NAME);
-        ExitWindowsEx(EWX_REBOOT, 0);
-    }
     return 0;
 }
