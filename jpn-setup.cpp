@@ -145,6 +145,9 @@ BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
 
     if (bInstall)
     {
+        RemoveFontResource(pszFileName);
+        keyFonts.RegDeleteValue(szEntry);
+
         DWORD cbData = 0;
         if (LPVOID pvData = DoGetCustomFont(id, &cbData))
         {
@@ -162,9 +165,9 @@ BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
                     if (CopyFile(szPath, szFontFile, FALSE))
                     {
                         DeleteFile(szPath);
+                        keyFonts.SetSz(szEntry, pszFileName);
                         if (AddFontResource(pszFileName))
                         {
-                            keyFonts.SetSz(szEntry, pszFileName);
                             return TRUE;
                         }
                     }
@@ -175,8 +178,8 @@ BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
     else
     {
         RemoveFontResource(pszFileName);
-        DeleteFile(szFontFile);
         keyFonts.RegDeleteValue(szEntry);
+        DeleteFile(szFontFile);
         return TRUE;
     }
 
@@ -237,6 +240,7 @@ WinMain(HINSTANCE   hInstance,
         BOOL ret = DoInstallFonts(TRUE);
         DoSetupSubst(JPN_MapForInstall, ARRAYSIZE(JPN_MapForInstall));
         DoNotepadFont(TRUE);
+        SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
     }
     else if (lstrcmpiA(lpCmdLine, "-u") == 0)
     {
@@ -244,6 +248,7 @@ WinMain(HINSTANCE   hInstance,
         BOOL ret = DoInstallFonts(FALSE);
         DoSetupSubst(JPN_MapForUninstall, ARRAYSIZE(JPN_MapForUninstall));
         DoNotepadFont(FALSE);
+        SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
     }
     else
     {
