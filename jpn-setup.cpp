@@ -2,6 +2,8 @@
 // Copyright (C) 2019 Katayama Hirofumi MZ.
 // This file is public domain software.
 #include "MRegKey.hpp"
+#include <cstdio>
+#include <shlwapi.h>
 
 #ifndef ARRAYSIZE
     #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
@@ -102,19 +104,91 @@ INT DoNotepadFont(BOOL bSetup)
     return 0;
 }
 
-INT DoInstallFonts(BOOL bInstall)
+LPVOID DoGetCustomFont(INT id, DWORD *pcbData)
 {
+    *pcbData = 0;
+
+    HMODULE hMod = GetModuleHandle(NULL);
+    HRSRC hRsrc = FindResource(hMod,
+                               MAKEINTRESOURCE(id),
+                               L"CUSTOMFONT");
+    if (!hRsrc)
+        return NULL;
+
+    DWORD cbData = SizeofResource(hMod, hRsrc);
+    HGLOBAL hGlobal = LoadResource(hMod, hRsrc);
+    if (!hGlobal)
+        return FALSE;
+
+    if (LPVOID pvData = LockResource(hGlobal))
+    {
+        *pcbData = cbData;
+        return pvData;
+    }
+    return NULL;
+}
+
+BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
+{
+    MRegKey keyFonts(HKEY_LOCAL_MACHINE,
+                     L"SOFTWARE\\Microsoft\\Windows\\CurrectVersion\\Fonts",
+                     TRUE);
+
+    TCHAR szFontFile[MAX_PATH];
+    GetWindowsDirectory(szFontFile, MAX_PATH);
+    PathAppend(szFontFile, L"Fonts");
+    PathAppend(szFontFile, pszFileName);
+
+    TCHAR szEntry[MAX_PATH];
+    lstrcpy(szEntry, pszEntry);
+    lstrcat(szEntry, L" (TrueType)");
+
     if (bInstall)
     {
-        AddFontResourceW(L"msgothic.ttc");
-        AddFontResourceW(L"msmincho.ttc");
+        DWORD cbData = 0;
+        if (LPVOID pvData = DoGetCustomFont(id, &cbData))
+        {
+            TCHAR szPath[MAX_PATH];
+            GetTempPath(MAX_PATH, szPath);
+            PathAppend(szPath, L"ReactOS-JPN-Setup.tmp");
+
+            if (FILE *fp = _wfopen(szPath, L"wb"))
+            {
+                int b = fwrite(pvData, cbData, 1, fp);
+                fclose(fp);
+
+                if (b)
+                {
+                    if (CopyFile(szPath, szFontFile, FALSE))
+                    {
+                        DeleteFile(szPath);
+                        if (AddFontResource(pszFileName))
+                        {
+                            keyFonts.SetSz(szEntry, pszFileName);
+                            return TRUE;
+                        }
+                    }
+                }
+            }
+        }
     }
     else
     {
-        RemoveFontResourceW(L"msgothic.ttc");
-        RemoveFontResourceW(L"msmincho.ttc");
+        RemoveFontResource(pszFileName);
+        DeleteFile(szFontFile);
+        keyFonts.RegDeleteValue(szEntry);
+        return TRUE;
     }
-    return 0;
+
+    return FALSE;
+}
+
+BOOL DoInstallFonts(BOOL bInstall)
+{
+    BOOL ret;
+    ret = DoInstallFont(L"msgothic.ttc", L"MS Gothic & MS PGothic", 100, bInstall);
+    ret = ret && DoInstallFont(L"msmincho.ttc", L"MS Mincho & MS PMincho", 101, bInstall);
+    return ret;
 }
 
 BOOL EnableProcessPriviledge(LPCTSTR pszSE_)
@@ -160,14 +234,14 @@ WinMain(HINSTANCE   hInstance,
     if (lstrcmpiA(lpCmdLine, "-i") == 0)
     {
         // install
-        DoInstallFonts(TRUE);
+        BOOL ret = DoInstallFonts(TRUE);
         DoSetupSubst(JPN_MapForInstall, ARRAYSIZE(JPN_MapForInstall));
         DoNotepadFont(TRUE);
     }
     else if (lstrcmpiA(lpCmdLine, "-u") == 0)
     {
         // uninstall
-        DoInstallFonts(FALSE);
+        BOOL ret = DoInstallFonts(FALSE);
         DoSetupSubst(JPN_MapForUninstall, ARRAYSIZE(JPN_MapForUninstall));
         DoNotepadFont(FALSE);
     }

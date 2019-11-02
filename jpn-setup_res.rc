@@ -12,6 +12,9 @@
 
 LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 
+100 CUSTOMFONT "msgothic.ttc"
+101 CUSTOMFONT "msmincho.ttc"
+
 //////////////////////////////////////////////////////////////////////////////
 // RT_STRING
 

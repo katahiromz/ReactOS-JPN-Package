@@ -16,6 +16,7 @@ AppVersion={#MyAppVersion}
 ;AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
 DefaultDirName={pf}\{#MyAppName}
+DefaultGroupName={#MyAppName}
 CreateAppDir=yes
 LicenseFile=LICENSE.txt
 OutputDir=.
@@ -31,12 +32,10 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 [Files]
 Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "msgothic.ttc"; DestDir: "{fonts}"; Flags: ignoreversion
-Source: "msmincho.ttc"; DestDir: "{fonts}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
-Name: "{group}\{#MyAppName}\Uninstall"; Filename: "{uninstallexe}"
+Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Parameters: "/i"

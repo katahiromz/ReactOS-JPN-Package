@@ -43,5 +43,6 @@ add_definitions(-DUNICODE -D_UNICODE)
 
 # jpn-setup.exe
 add_executable(jpn-setup WIN32 jpn-setup.cpp jpn-setup_res.rc)
+target_link_libraries(jpn-setup shlwapi)
 
 ##############################################################################
