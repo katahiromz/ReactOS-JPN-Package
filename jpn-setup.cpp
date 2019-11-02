@@ -34,25 +34,50 @@ WCHAR JF_LocalName1[] = {0xFF2D, 0xFF33, ' ', 0xFF30, 0x660E, 0x671D, 0};       
 WCHAR JF_LocalName2[] = {0xFF2D, 0xFF33, ' ', 0x30B4, 0x30B7, 0x30C3, 0x30AF, 0};           // MS Gothic
 WCHAR JF_LocalName3[] = {0xFF2D, 0xFF33, ' ', 0xFF30, 0x30B4, 0x30B7, 0x30C3, 0x30AF, 0};   // MS PGothic
 
-static const FONTSUBST JPN_MapForInstall[] =
+static const FONTSUBST NEU_MapForInstall[] =
 {
     { L"MS Mincho",       NULL },
     { L"MS Gothic",       NULL },
     { L"MS PMincho",      NULL },
     { L"MS PGothic",      NULL },
+};
+
+static const FONTSUBST JPN_MapForInstall[] =
+{
     { JF_LocalName0,      NULL },
     { JF_LocalName2,      NULL },
     { JF_LocalName1,      NULL },
     { JF_LocalName3,      NULL },
 };
 
-static const FONTSUBST JPN_MapForUninstall[] =
+static const FONTSUBST NEU_MapForUninstallNoDroid[] =
+{
+    { L"MS UI Gothic",    NULL },
+    { L"MS Mincho",       NULL },
+    { L"MS PMincho",      NULL },
+    { L"MS Gothic",       NULL },
+    { L"MS PGothic",      NULL },
+};
+
+static const FONTSUBST JPN_MapForUninstallNoDroid[] =
+{
+    { JF_LocalName0,      NULL },
+    { JF_LocalName1,      NULL },
+    { JF_LocalName2,      NULL },
+    { JF_LocalName3,      NULL },
+};
+
+static const FONTSUBST NEU_MapForUninstallWithDroid[] =
 {
     { L"MS UI Gothic",    L"Droid Sans Fallback" },
     { L"MS Mincho",       L"Droid Sans Fallback" },
     { L"MS PMincho",      L"Droid Sans Fallback" },
     { L"MS Gothic",       L"Droid Sans Fallback" },
     { L"MS PGothic",      L"Droid Sans Fallback" },
+};
+
+static const FONTSUBST JPN_MapForUninstallWithDroid[] =
+{
     { JF_LocalName0,      L"Droid Sans Fallback" },
     { JF_LocalName1,      L"Droid Sans Fallback" },
     { JF_LocalName2,      L"Droid Sans Fallback" },
@@ -88,6 +113,12 @@ LONG DoSetupSubst(const FONTSUBST *map, size_t count)
         LONG nError = DoSubst(key, &mapping);
     }
     return 0;
+}
+
+template <size_t t_num>
+LONG DoSetupSubst(const FONTSUBST (&map)[t_num])
+{
+    return DoSetupSubst(&map[0], t_num);
 }
 
 INT DoNotepadFont(BOOL bSetup)
@@ -136,7 +167,9 @@ LPVOID DoGetCustomFont(INT id, DWORD *pcbData)
     return NULL;
 }
 
-BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
+typedef LONG MYERROR;
+
+MYERROR DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
 {
     MRegKey keyFonts;
 
@@ -169,7 +202,7 @@ BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
         if (!pvData || !cbData)
         {
             assert(0);
-            return FALSE;
+            return 1;
         }
 
         TCHAR szPath[MAX_PATH];
@@ -180,7 +213,7 @@ BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
         if (!fp)
         {
             assert(0);
-            return FALSE;
+            return 2;
         }
 
         int b = fwrite(pvData, cbData, 1, fp);
@@ -189,13 +222,13 @@ BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
         if (!b)
         {
             assert(0);
-            return FALSE;
+            return 3;
         }
 
         if (!CopyFile(szPath, szFontFile, FALSE))
         {
             assert(0);
-            return FALSE;
+            return 4;
         }
 
         DeleteFile(szPath);
@@ -203,36 +236,38 @@ BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
         if (LONG err = keyFonts.SetSz(szEntry, pszFileName))
         {
             assert(0);
-            return FALSE;
+            return 5;
         }
 
         if (!AddFontResource(pszFileName))
         {
             assert(0);
-            return FALSE;
+            return 6;
         }
 
-        return TRUE;
+        return 0;
     }
     else
     {
         RemoveFontResource(pszFileName);
         keyFonts.RegDeleteValue(szEntry);
         DeleteFile(szFontFile);
-        return TRUE;
+        return 0;
     }
-
-    return FALSE;
 }
 
-BOOL DoInstallFonts(BOOL bInstall)
+MYERROR DoInstallFonts(BOOL bInstall)
 {
-    BOOL ret;
-    ret = DoInstallFont(L"msgothic.ttc", L"MS Gothic & MS PGothic", 100, bInstall);
-    assert(ret);
-    ret = DoInstallFont(L"msmincho.ttc", L"MS Mincho & MS PMincho", 101, bInstall);
-    assert(ret);
-    return ret;
+    MYERROR err;
+    err = DoInstallFont(L"msgothic.ttc", L"MS Gothic & MS PGothic", 100, bInstall);
+    if (err)
+        return err;
+
+    err = DoInstallFont(L"msmincho.ttc", L"MS Mincho & MS PMincho", 101, bInstall);
+    if (err)
+        return err;
+
+    return 0;
 }
 
 BOOL EnableProcessPriviledge(LPCTSTR pszSE_)
@@ -259,6 +294,21 @@ BOOL EnableProcessPriviledge(LPCTSTR pszSE_)
     return f;
 }
 
+BOOL IsUserJapanese(void)
+{
+    return PRIMARYLANGID(GetUserDefaultLangID()) == LANG_JAPANESE;
+}
+
+BOOL IsThereDroidFont(void)
+{
+    TCHAR szFontFile[MAX_PATH];
+    GetWindowsDirectory(szFontFile, MAX_PATH);
+    PathAppend(szFontFile, L"Fonts");
+    PathAppend(szFontFile, L"DroidSansFallback.ttf");
+
+    return PathFileExists(szFontFile);
+}
+
 extern "C"
 INT WINAPI
 WinMain(HINSTANCE   hInstance,
@@ -278,23 +328,59 @@ WinMain(HINSTANCE   hInstance,
     if (lstrcmpiA(lpCmdLine, "/i") == 0)
     {
         // install
-        BOOL ret = DoInstallFonts(TRUE);
-        DoSetupSubst(JPN_MapForInstall, ARRAYSIZE(JPN_MapForInstall));
+        if (MYERROR err = DoInstallFonts(TRUE))
+        {
+            TCHAR szText[MAX_PATH * 2];
+            wsprintf(szText, LoadStringDx(103), err);
+            MessageBox(NULL, szText, NULL, MB_ICONERROR);
+            return -1;
+        }
+
+        DoSetupSubst(NEU_MapForInstall);
+        if (IsUserJapanese())
+        {
+            DoSetupSubst(JPN_MapForInstall);
+        }
         DoNotepadFont(TRUE);
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
+
+        return 0;
     }
     else if (lstrcmpiA(lpCmdLine, "/u") == 0)
     {
         // uninstall
-        BOOL ret = DoInstallFonts(FALSE);
-        DoSetupSubst(JPN_MapForUninstall, ARRAYSIZE(JPN_MapForUninstall));
+        if (MYERROR err = DoInstallFonts(FALSE))
+        {
+            TCHAR szText[MAX_PATH * 2];
+            wsprintf(szText, LoadStringDx(103), err);
+            MessageBox(NULL, szText, NULL, MB_ICONERROR);
+            return -1;
+        }
+
+        if (IsThereDroidFont())
+        {
+            DoSetupSubst(NEU_MapForUninstallWithDroid);
+            if (IsUserJapanese())
+            {
+                DoSetupSubst(JPN_MapForUninstallWithDroid);
+            }
+        }
+        else
+        {
+            DoSetupSubst(NEU_MapForUninstallNoDroid);
+            if (IsUserJapanese())
+            {
+                DoSetupSubst(JPN_MapForUninstallNoDroid);
+            }
+        }
+
         DoNotepadFont(FALSE);
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
+
+        return 0;
     }
     else
     {
-        return -1;
+        return 0;
     }
-
-    return 0;
 }

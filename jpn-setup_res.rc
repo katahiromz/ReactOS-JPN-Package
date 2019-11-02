@@ -23,6 +23,7 @@ STRINGTABLE
     100, "Reboot now?"
     101, "ReactOS Japanese Package"
     102, "This software is for ReactOS only."
+    103, "Setup failed. Error code: %d"
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -37,6 +38,7 @@ STRINGTABLE
     100, "今から再起動しますか？"
     101, "ReactOS 日本語パッケージ"
     102, "このソフトはReactOS専用です。"
+    103, "Setup failed. Error code: %d"
 }
 
 //////////////////////////////////////////////////////////////////////////////
