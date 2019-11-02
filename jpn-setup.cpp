@@ -113,26 +113,42 @@ LPVOID DoGetCustomFont(INT id, DWORD *pcbData)
                                MAKEINTRESOURCE(id),
                                L"CUSTOMFONT");
     if (!hRsrc)
+    {
+        assert(0);
         return NULL;
+    }
 
     DWORD cbData = SizeofResource(hMod, hRsrc);
     HGLOBAL hGlobal = LoadResource(hMod, hRsrc);
     if (!hGlobal)
+    {
+        assert(0);
         return FALSE;
+    }
 
     if (LPVOID pvData = LockResource(hGlobal))
     {
         *pcbData = cbData;
         return pvData;
     }
+
+    assert(0);
     return NULL;
 }
 
 BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
 {
-    MRegKey keyFonts(HKEY_LOCAL_MACHINE,
-                     L"SOFTWARE\\Microsoft\\Windows\\CurrectVersion\\Fonts",
-                     TRUE);
+    MRegKey keyFonts;
+
+    LONG n = keyFonts.RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+                                   L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts",
+                                   0,
+                                   KEY_WRITE);
+    if (n)
+    {
+        assert(0);
+        return FALSE;
+    }
 
     TCHAR szFontFile[MAX_PATH];
     GetWindowsDirectory(szFontFile, MAX_PATH);
@@ -149,31 +165,54 @@ BOOL DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
         keyFonts.RegDeleteValue(szEntry);
 
         DWORD cbData = 0;
-        if (LPVOID pvData = DoGetCustomFont(id, &cbData))
+        LPVOID pvData = DoGetCustomFont(id, &cbData);
+        if (!pvData || !cbData)
         {
-            TCHAR szPath[MAX_PATH];
-            GetTempPath(MAX_PATH, szPath);
-            PathAppend(szPath, L"ReactOS-JPN-Setup.tmp");
-
-            if (FILE *fp = _wfopen(szPath, L"wb"))
-            {
-                int b = fwrite(pvData, cbData, 1, fp);
-                fclose(fp);
-
-                if (b)
-                {
-                    if (CopyFile(szPath, szFontFile, FALSE))
-                    {
-                        DeleteFile(szPath);
-                        keyFonts.SetSz(szEntry, pszFileName);
-                        if (AddFontResource(pszFileName))
-                        {
-                            return TRUE;
-                        }
-                    }
-                }
-            }
+            assert(0);
+            return FALSE;
         }
+
+        TCHAR szPath[MAX_PATH];
+        GetTempPath(MAX_PATH, szPath);
+        PathAppend(szPath, L"ReactOS-JPN-Setup.tmp");
+
+        FILE *fp = _wfopen(szPath, L"wb");
+        if (!fp)
+        {
+            assert(0);
+            return FALSE;
+        }
+
+        int b = fwrite(pvData, cbData, 1, fp);
+        fclose(fp);
+
+        if (!b)
+        {
+            assert(0);
+            return FALSE;
+        }
+
+        if (!CopyFile(szPath, szFontFile, FALSE))
+        {
+            assert(0);
+            return FALSE;
+        }
+
+        DeleteFile(szPath);
+
+        if (LONG err = keyFonts.SetSz(szEntry, pszFileName))
+        {
+            assert(0);
+            return FALSE;
+        }
+
+        if (!AddFontResource(pszFileName))
+        {
+            assert(0);
+            return FALSE;
+        }
+
+        return TRUE;
     }
     else
     {
@@ -190,7 +229,9 @@ BOOL DoInstallFonts(BOOL bInstall)
 {
     BOOL ret;
     ret = DoInstallFont(L"msgothic.ttc", L"MS Gothic & MS PGothic", 100, bInstall);
-    ret = ret && DoInstallFont(L"msmincho.ttc", L"MS Mincho & MS PMincho", 101, bInstall);
+    assert(ret);
+    ret = DoInstallFont(L"msmincho.ttc", L"MS Mincho & MS PMincho", 101, bInstall);
+    assert(ret);
     return ret;
 }
 
@@ -234,7 +275,7 @@ WinMain(HINSTANCE   hInstance,
         return -1;
     }
 
-    if (lstrcmpiA(lpCmdLine, "-i") == 0)
+    if (lstrcmpiA(lpCmdLine, "/i") == 0)
     {
         // install
         BOOL ret = DoInstallFonts(TRUE);
@@ -242,7 +283,7 @@ WinMain(HINSTANCE   hInstance,
         DoNotepadFont(TRUE);
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
     }
-    else if (lstrcmpiA(lpCmdLine, "-u") == 0)
+    else if (lstrcmpiA(lpCmdLine, "/u") == 0)
     {
         // uninstall
         BOOL ret = DoInstallFonts(FALSE);
