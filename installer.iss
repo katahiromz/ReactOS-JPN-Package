@@ -23,6 +23,7 @@ OutputBaseFilename=reactos-jpn-setup-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 AlwaysRestart=yes
+UninstallRestartComputer=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -33,6 +34,9 @@ Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "msgothic.ttc"; DestDir: "{fonts}"; Flags: ignoreversion
 Source: "msmincho.ttc"; DestDir: "{fonts}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+
+[Icons]
+Name: "{group}\{#MyAppName}\Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Parameters: "/i"
