@@ -1,1 +1,1 @@
-These msgothic.ttc and msmincho.ttc font files of there are not Windows stuffs.
+These font files not Windows stuffs.

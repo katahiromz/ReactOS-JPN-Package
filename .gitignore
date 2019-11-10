@@ -30,3 +30,5 @@ ipch
 x64
 *-old
 *.skrold
+*.dll
+lib*.a

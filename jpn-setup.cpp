@@ -9,6 +9,8 @@
     #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
 #endif
 
+#define DATA_FILE_NAME TEXT("jpn-data.dll")
+
 LPTSTR LoadStringDx(INT nID)
 {
     static UINT s_index = 0;
@@ -40,6 +42,7 @@ static const FONTSUBST NEU_MapForInstall[] =
     { L"MS Gothic",       NULL },
     { L"MS PMincho",      NULL },
     { L"MS PGothic",      NULL },
+    { L"MS UI Gothic",    NULL },
 };
 
 static const FONTSUBST JPN_MapForInstall[] =
@@ -48,6 +51,8 @@ static const FONTSUBST JPN_MapForInstall[] =
     { JF_LocalName2,      NULL },
     { JF_LocalName1,      NULL },
     { JF_LocalName3,      NULL },
+    { L"Tahoma",          L"MS UI Gothic" },
+    { L"System",          L"MS UI Gothic" },
 };
 
 static const FONTSUBST NEU_MapForUninstallNoDroid[] =
@@ -57,6 +62,9 @@ static const FONTSUBST NEU_MapForUninstallNoDroid[] =
     { L"MS PMincho",      NULL },
     { L"MS Gothic",       NULL },
     { L"MS PGothic",      NULL },
+    { L"MS UI Gothic",    NULL },
+    { L"System",          NULL },
+    { L"Tahoma",          NULL },
 };
 
 static const FONTSUBST JPN_MapForUninstallNoDroid[] =
@@ -65,6 +73,8 @@ static const FONTSUBST JPN_MapForUninstallNoDroid[] =
     { JF_LocalName1,      NULL },
     { JF_LocalName2,      NULL },
     { JF_LocalName3,      NULL },
+    { L"System",          NULL },
+    { L"Tahoma",          NULL },
 };
 
 static const FONTSUBST NEU_MapForUninstallWithDroid[] =
@@ -74,6 +84,9 @@ static const FONTSUBST NEU_MapForUninstallWithDroid[] =
     { L"MS PMincho",      L"Droid Sans Fallback" },
     { L"MS Gothic",       L"Droid Sans Fallback" },
     { L"MS PGothic",      L"Droid Sans Fallback" },
+    { L"MS UI Gothic",    L"Droid Sans Fallback" },
+    { L"System",          NULL },
+    { L"Tahoma",          NULL },
 };
 
 static const FONTSUBST JPN_MapForUninstallWithDroid[] =
@@ -82,7 +95,79 @@ static const FONTSUBST JPN_MapForUninstallWithDroid[] =
     { JF_LocalName1,      L"Droid Sans Fallback" },
     { JF_LocalName2,      L"Droid Sans Fallback" },
     { JF_LocalName3,      L"Droid Sans Fallback" },
+    { L"System",          L"Droid Sans Fallback" },
+    { L"Tahoma",          L"Droid Sans Fallback" },
 };
+
+LPCWSTR DoGetDataFileName(void)
+{
+    static TCHAR szPath[MAX_PATH];
+    GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath));
+    PathRemoveFileSpec(szPath);
+    PathAppend(szPath, DATA_FILE_NAME);
+    return szPath;
+}
+
+HINSTANCE DoLoadJapaneseData(VOID)
+{
+    return LoadLibraryEx(DoGetDataFileName(), NULL, LOAD_LIBRARY_AS_DATAFILE);
+}
+
+// NtSetDefaultLocale
+typedef LONG (WINAPI *NTSETDEFAULTLOCALE)(BOOLEAN, LCID);
+
+void DoSetLocale(BOOLEAN b, LCID lcid, LPCWSTR pszACP, LPCWSTR pszOEMCP)
+{
+    if (HINSTANCE hNTDLL = LoadLibraryA("ntdll.dll"))
+    {
+        if (FARPROC fn = GetProcAddress(hNTDLL, "NtSetDefaultLocale"))
+        {
+            NTSETDEFAULTLOCALE pFN = (NTSETDEFAULTLOCALE)fn;
+            (*pFN)(TRUE, lcid);
+        }
+        FreeLibrary(hNTDLL);
+    }
+
+    HKEY hLangKey;
+    RegOpenKeyW(HKEY_LOCAL_MACHINE,
+                L"SYSTEM\\CurrentControlSet\\Control\\NLS\\CodePage",
+                &hLangKey);
+    RegSetValueExW(hLangKey, L"ACP", 0, REG_SZ, (BYTE *)pszACP, (wcslen(pszACP) + 1) * sizeof(WCHAR));
+    RegSetValueExW(hLangKey, L"OEMCP", 0, REG_SZ, (BYTE *)pszOEMCP, (wcslen(pszOEMCP) + 1) * sizeof(WCHAR));
+    RegCloseKey(hLangKey);
+}
+
+BOOL DoMakeUserJapanese(HWND hwnd)
+{
+    WCHAR szPath[MAX_PATH];
+    GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath));
+    PathRemoveFileSpec(szPath);
+    PathAppend(szPath, L"jpn-locale.reg");
+
+    WCHAR szParams[MAX_PATH];
+    wsprintf(szParams, L"/s \"%s\"", szPath);
+    ShellExecute(hwnd, NULL, L"regedit", szParams, NULL, SW_HIDE);
+
+    LANGID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
+    LCID lcid = MAKELCID(langid, SORT_DEFAULT);
+    DoSetLocale(TRUE, lcid, L"932", L"932");
+}
+
+BOOL DoMakeUserEnglish(HWND hwnd)
+{
+    WCHAR szPath[MAX_PATH];
+    GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath));
+    PathRemoveFileSpec(szPath);
+    PathAppend(szPath, L"eng-locale.reg");
+
+    WCHAR szParams[MAX_PATH];
+    wsprintf(szParams, L"/s \"%s\"", szPath);
+    ShellExecute(hwnd, NULL, L"regedit", szParams, NULL, SW_HIDE);
+
+    LANGID langid = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
+    LCID lcid = MAKELCID(langid, SORT_DEFAULT);
+    DoSetLocale(TRUE, lcid, L"1252", L"437");
+}
 
 LONG DoSubst(MRegKey& key, const FONTSUBST *subst)
 {
@@ -135,12 +220,11 @@ INT DoNotepadFont(BOOL bSetup)
     return 0;
 }
 
-LPVOID DoGetCustomFont(INT id, DWORD *pcbData)
+LPVOID DoGetCustomFont(HINSTANCE hinstData, INT id, DWORD *pcbData)
 {
     *pcbData = 0;
 
-    HMODULE hMod = GetModuleHandle(NULL);
-    HRSRC hRsrc = FindResource(hMod,
+    HRSRC hRsrc = FindResource(hinstData,
                                MAKEINTRESOURCE(id),
                                L"CUSTOMFONT");
     if (!hRsrc)
@@ -149,8 +233,8 @@ LPVOID DoGetCustomFont(INT id, DWORD *pcbData)
         return NULL;
     }
 
-    DWORD cbData = SizeofResource(hMod, hRsrc);
-    HGLOBAL hGlobal = LoadResource(hMod, hRsrc);
+    DWORD cbData = SizeofResource(hinstData, hRsrc);
+    HGLOBAL hGlobal = LoadResource(hinstData, hRsrc);
     if (!hGlobal)
     {
         assert(0);
@@ -197,8 +281,10 @@ MYERROR DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInsta
         RemoveFontResource(pszFileName);
         keyFonts.RegDeleteValue(szEntry);
 
+        HINSTANCE hinstData = DoLoadJapaneseData();
+
         DWORD cbData = 0;
-        LPVOID pvData = DoGetCustomFont(id, &cbData);
+        LPVOID pvData = DoGetCustomFont(hinstData, id, &cbData);
         if (!pvData || !cbData)
         {
             assert(0);
@@ -218,6 +304,8 @@ MYERROR DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInsta
 
         int b = fwrite(pvData, cbData, 1, fp);
         fclose(fp);
+
+        FreeLibrary(hinstData);
 
         if (!b)
         {
@@ -264,6 +352,10 @@ MYERROR DoInstallFonts(BOOL bInstall)
         return err;
 
     err = DoInstallFont(L"msmincho.ttc", L"MS Mincho & MS PMincho", 101, bInstall);
+    if (err)
+        return err;
+
+    err = DoInstallFont(L"msuigothic.ttf", L"MS UI Gothic", 102, bInstall);
     if (err)
         return err;
 
@@ -341,9 +433,21 @@ WinMain(HINSTANCE   hInstance,
         {
             DoSetupSubst(JPN_MapForInstall);
         }
+        else
+        {
+            if (MessageBox(NULL, LoadStringDx(104), NULL,
+                           MB_ICONINFORMATION | MB_YESNO) == IDYES)
+            {
+                DoMakeUserJapanese(NULL);
+                DoSetupSubst(JPN_MapForInstall);
+            }
+        }
         DoNotepadFont(TRUE);
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 
+        DeleteFile(DoGetDataFileName());
+
+        
         return 0;
     }
     else if (lstrcmpiA(lpCmdLine, "/u") == 0)
@@ -357,24 +461,34 @@ WinMain(HINSTANCE   hInstance,
             return -1;
         }
 
+        DoNotepadFont(FALSE);
+
         if (IsThereDroidFont())
         {
             DoSetupSubst(NEU_MapForUninstallWithDroid);
-            if (IsUserJapanese())
-            {
-                DoSetupSubst(JPN_MapForUninstallWithDroid);
-            }
         }
         else
         {
             DoSetupSubst(NEU_MapForUninstallNoDroid);
-            if (IsUserJapanese())
+        }
+
+        if (IsUserJapanese())
+        {
+            if (!IsThereDroidFont())
             {
-                DoSetupSubst(JPN_MapForUninstallNoDroid);
+                DoMakeUserEnglish(NULL);
+            }
+            else if (MessageBox(NULL, LoadStringDx(106), NULL,
+                                MB_ICONINFORMATION | MB_YESNO) == IDYES)
+            {
+                DoMakeUserEnglish(NULL);
+            }
+            else
+            {
+                DoSetupSubst(JPN_MapForUninstallWithDroid);
             }
         }
 
-        DoNotepadFont(FALSE);
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 
         return 0;

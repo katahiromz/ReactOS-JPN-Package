@@ -8,16 +8,9 @@
 
 LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 
-STRINGTABLE
-{
-    100, "Reboot now?"
-    101, "ReactOS Japanese Package"
-    102, "This software is for ReactOS only."
-    103, "Setup failed. Error code: %d"
-    104, "Do you want make your ReactOS Japanese?"
-    105, "Failed."
-    106, "Do you want make your ReactOS English?"
-}
+100 CUSTOMFONT "msgothic.ttc"
+101 CUSTOMFONT "msmincho.ttc"
+102 CUSTOMFONT "msuigothic.ttf"
 
 #ifdef APSTUDIO_INVOKED
 

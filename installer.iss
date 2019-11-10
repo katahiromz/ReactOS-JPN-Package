@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ReactOS JPN Package"
-#define MyAppVersion "0.5"
+#define MyAppVersion "0.6"
 #define MyAppPublisher "Katayama Hirofumi MZ"
 #define MyAppExeName "jpn-setup.exe"
 
@@ -28,10 +28,13 @@ UninstallRestartComputer=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
-Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 
 [Files]
 Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "jpn-data.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "eng-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
+Source: "jpn-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
