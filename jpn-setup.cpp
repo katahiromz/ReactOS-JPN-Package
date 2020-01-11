@@ -156,6 +156,7 @@ BOOL DoMakeUserJapanese(HWND hwnd)
     keyConsole.RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Console"),
         0, KEY_WRITE | KEY_ENUMERATE_SUB_KEYS);
     keyConsole.SetSz(L"FaceName", L"MS Gothic");
+    keyConsole.SetDword(L"CodePage", 932);
 
     for (DWORD dwIndex = 0; ; ++dwIndex)
     {
@@ -167,6 +168,7 @@ BOOL DoMakeUserJapanese(HWND hwnd)
         MRegKey key;
         key.RegOpenKeyEx(keyConsole, szName, 0, KEY_WRITE);
         key.SetSz(L"FaceName", L"MS Gothic");
+        key.SetDword(L"CodePage", 932);
     }
 }
 
@@ -189,6 +191,7 @@ BOOL DoMakeUserEnglish(HWND hwnd)
     keyConsole.RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Console"),
         0, KEY_WRITE | KEY_ENUMERATE_SUB_KEYS);
     keyConsole.SetSz(L"FaceName", L"VGA");
+    keyConsole.SetDword(L"CodePage", 437);
 
     for (DWORD dwIndex = 0; ; ++dwIndex)
     {
@@ -200,6 +203,7 @@ BOOL DoMakeUserEnglish(HWND hwnd)
         MRegKey key;
         key.RegOpenKeyEx(keyConsole, szName, 0, KEY_WRITE);
         key.SetSz(L"FaceName", L"VGA");
+        key.SetDword(L"CodePage", 437);
     }
 }
 
