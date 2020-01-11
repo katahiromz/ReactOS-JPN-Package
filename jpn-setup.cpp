@@ -151,6 +151,23 @@ BOOL DoMakeUserJapanese(HWND hwnd)
     LANGID langid = MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT);
     LCID lcid = MAKELCID(langid, SORT_DEFAULT);
     DoSetLocale(TRUE, lcid, L"932", L"932");
+
+    MRegKey keyConsole;
+    keyConsole.RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Console"),
+        0, KEY_WRITE | KEY_ENUMERATE_SUB_KEYS);
+    keyConsole.SetSz(L"FaceName", L"MS Gothic");
+
+    for (DWORD dwIndex = 0; ; ++dwIndex)
+    {
+        WCHAR szName[MAX_PATH];
+        DWORD cchName = ARRAYSIZE(szName);
+        if (keyConsole.RegEnumKeyEx(dwIndex, szName, &cchName) != ERROR_SUCCESS)
+            break;
+
+        MRegKey key;
+        key.RegOpenKeyEx(keyConsole, szName, 0, KEY_WRITE);
+        key.SetSz(L"FaceName", L"MS Gothic");
+    }
 }
 
 BOOL DoMakeUserEnglish(HWND hwnd)
@@ -167,6 +184,23 @@ BOOL DoMakeUserEnglish(HWND hwnd)
     LANGID langid = MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US);
     LCID lcid = MAKELCID(langid, SORT_DEFAULT);
     DoSetLocale(TRUE, lcid, L"1252", L"437");
+
+    MRegKey keyConsole;
+    keyConsole.RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Console"),
+        0, KEY_WRITE | KEY_ENUMERATE_SUB_KEYS);
+    keyConsole.SetSz(L"FaceName", L"VGA");
+
+    for (DWORD dwIndex = 0; ; ++dwIndex)
+    {
+        WCHAR szName[MAX_PATH];
+        DWORD cchName = ARRAYSIZE(szName);
+        if (keyConsole.RegEnumKeyEx(dwIndex, szName, &cchName) != ERROR_SUCCESS)
+            break;
+
+        MRegKey key;
+        key.RegOpenKeyEx(keyConsole, szName, 0, KEY_WRITE);
+        key.SetSz(L"FaceName", L"VGA");
+    }
 }
 
 LONG DoSubst(MRegKey& key, const FONTSUBST *subst)
