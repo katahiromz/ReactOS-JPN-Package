@@ -351,12 +351,7 @@ MYERROR DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInsta
             return 3;
         }
 
-        if (!CopyFile(szPath, szFontFile, FALSE))
-        {
-            assert(0);
-            return 4;
-        }
-
+        CopyFile(szPath, szFontFile, FALSE);
         DeleteFile(szPath);
 
         if (LONG err = keyFonts.SetSz(szEntry, pszFileName))
