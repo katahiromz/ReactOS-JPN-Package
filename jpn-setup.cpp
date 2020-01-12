@@ -430,6 +430,38 @@ BOOL IsThereDroidFont(void)
     return PathFileExists(szFontFile);
 }
 
+BOOL DoSetUserKeyboard(DWORD dwIndex, DWORD dwLangID, BOOL bActivate)
+{
+    HKEY hKey;
+    WCHAR szPreload[32], szIndex[32];
+    DWORD cbPreload;
+
+    wsprintfW(szPreload, L"%08lX", dwLangID);
+    wsprintfW(szIndex, L"%lu", dwIndex);
+
+    if (RegOpenKeyExW(HKEY_CURRENT_USER,
+                      L"Keyboard Layout\\Preload",
+                      0,
+                      KEY_SET_VALUE,
+                      &hKey) == ERROR_SUCCESS)
+    {
+        cbPreload = (lstrlenW(szPreload) + 1) * sizeof(WCHAR);
+        RegSetValueExW(hKey, szIndex, 0, REG_SZ, (LPBYTE)szPreload, cbPreload);
+        RegCloseKey(hKey);
+
+        if (bActivate)
+        {
+            HKL hKL = LoadKeyboardLayoutW(szPreload, KLF_SUBSTITUTE_OK | KLF_NOTELLSHELL);
+            ActivateKeyboardLayout(hKL, KLF_REORDER);
+
+            SystemParametersInfoW(SPI_SETDEFAULTINPUTLANG, 0, &hKL, 0);
+        }
+        return TRUE;
+    }
+
+    return FALSE;
+}
+
 extern "C"
 INT WINAPI
 WinMain(HINSTANCE   hInstance,
@@ -458,25 +490,21 @@ WinMain(HINSTANCE   hInstance,
         }
 
         DoSetupSubst(NEU_MapForInstall);
-        if (IsUserJapanese())
+        if (IsUserJapanese() ||
+            MessageBox(NULL, LoadStringDx(104), LoadStringDx(101),
+                       MB_ICONINFORMATION | MB_YESNO) == IDYES)
         {
+            DoMakeUserJapanese(NULL);
             DoSetupSubst(JPN_MapForInstall);
+            DoSetUserKeyboard(1, 0x411, TRUE);
+            DoSetUserKeyboard(2, 0x409, FALSE);
         }
-        else
-        {
-            if (MessageBox(NULL, LoadStringDx(104), LoadStringDx(101),
-                           MB_ICONINFORMATION | MB_YESNO) == IDYES)
-            {
-                DoMakeUserJapanese(NULL);
-                DoSetupSubst(JPN_MapForInstall);
-            }
-        }
+
         DoNotepadFont(TRUE);
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 
         DeleteFile(DoGetDataFileName());
 
-        
         return 0;
     }
     else if (lstrcmpiA(lpCmdLine, "/u") == 0)
@@ -503,14 +531,13 @@ WinMain(HINSTANCE   hInstance,
 
         if (IsUserJapanese())
         {
-            if (!IsThereDroidFont())
+            if (!IsThereDroidFont() ||
+                MessageBox(NULL, LoadStringDx(106), LoadStringDx(101),
+                           MB_ICONINFORMATION | MB_YESNO) == IDYES)
             {
                 DoMakeUserEnglish(NULL);
-            }
-            else if (MessageBox(NULL, LoadStringDx(106), LoadStringDx(101),
-                                MB_ICONINFORMATION | MB_YESNO) == IDYES)
-            {
-                DoMakeUserEnglish(NULL);
+                DoSetUserKeyboard(1, 0x409, TRUE);
+                DoSetUserKeyboard(2, 0x411, FALSE);
             }
             else
             {
