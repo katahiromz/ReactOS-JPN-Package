@@ -393,10 +393,6 @@ MYERROR DoInstallFonts(BOOL bInstall)
     if (err)
         return err;
 
-    err = DoInstallFont(L"msuigothic.ttf", L"MS UI Gothic", 102, bInstall);
-    if (err)
-        return err;
-
     return 0;
 }
 
