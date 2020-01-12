@@ -464,7 +464,7 @@ WinMain(HINSTANCE   hInstance,
         }
         else
         {
-            if (MessageBox(NULL, LoadStringDx(104), NULL,
+            if (MessageBox(NULL, LoadStringDx(104), LoadStringDx(101),
                            MB_ICONINFORMATION | MB_YESNO) == IDYES)
             {
                 DoMakeUserJapanese(NULL);
@@ -507,7 +507,7 @@ WinMain(HINSTANCE   hInstance,
             {
                 DoMakeUserEnglish(NULL);
             }
-            else if (MessageBox(NULL, LoadStringDx(106), NULL,
+            else if (MessageBox(NULL, LoadStringDx(106), LoadStringDx(101),
                                 MB_ICONINFORMATION | MB_YESNO) == IDYES)
             {
                 DoMakeUserEnglish(NULL);
