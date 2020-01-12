@@ -385,7 +385,7 @@ MYERROR DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInsta
 MYERROR DoInstallFonts(BOOL bInstall)
 {
     MYERROR err;
-    err = DoInstallFont(L"msgothic.ttc", L"MS Gothic & MS PGothic", 100, bInstall);
+    err = DoInstallFont(L"msgothic.ttc", L"MS Gothic & MS PGothic & MS UI Gothic", 100, bInstall);
     if (err)
         return err;
 
