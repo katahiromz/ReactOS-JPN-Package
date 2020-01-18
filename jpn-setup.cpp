@@ -430,36 +430,69 @@ BOOL IsThereDroidFont(void)
     return PathFileExists(szFontFile);
 }
 
-BOOL DoSetUserKeyboard(DWORD dwIndex, DWORD dwLangID, BOOL bActivate)
+BOOL DoSetUserKeyboardRegistry(DWORD dwIndex, DWORD dwLangID, DWORD dwLangID2, BOOL bInstall)
 {
-    HKEY hKey;
-    WCHAR szPreload[32], szIndex[32];
-    DWORD cbPreload;
+    WCHAR szPreload[32], szPreload2[32], szIndex[32], szLang[32];
+    DWORD cb;
 
     wsprintfW(szPreload, L"%08lX", dwLangID);
+    wsprintfW(szPreload2, L"%08lX", dwLangID2);
     wsprintfW(szIndex, L"%lu", dwIndex);
+    wsprintfW(szLang, L"%04lX", dwLangID);
 
-    if (RegOpenKeyExW(HKEY_CURRENT_USER,
-                      L"Keyboard Layout\\Preload",
-                      0,
-                      KEY_SET_VALUE,
-                      &hKey) == ERROR_SUCCESS)
+    /* current user */
     {
-        cbPreload = (lstrlenW(szPreload) + 1) * sizeof(WCHAR);
-        RegSetValueExW(hKey, szIndex, 0, REG_SZ, (LPBYTE)szPreload, cbPreload);
-        RegCloseKey(hKey);
-
-        if (bActivate)
+        MRegKey key;
+        if (key.RegOpenKeyExW(HKEY_CURRENT_USER, L"Keyboard Layout\\Preload",
+                              0, KEY_WRITE) == ERROR_SUCCESS)
         {
-            HKL hKL = LoadKeyboardLayoutW(szPreload, KLF_SUBSTITUTE_OK | KLF_NOTELLSHELL);
-            ActivateKeyboardLayout(hKL, KLF_REORDER);
+            cb = (lstrlenW(szPreload) + 1) * sizeof(WCHAR);
+            RegSetValueExW(key, szIndex, 0, REG_SZ, (LPBYTE)szPreload, cb);
 
-            SystemParametersInfoW(SPI_SETDEFAULTINPUTLANG, 0, &hKL, 0);
+            RegDeleteValueW(key, szPreload2);
         }
-        return TRUE;
     }
 
-    return FALSE;
+    /* default user */
+    {
+        MRegKey key;
+        if (key.RegOpenKeyExW(HKEY_USERS, L".DEFAULT\\Keyboard Layout\\Preload",
+                              0, KEY_WRITE) == ERROR_SUCCESS)
+        {
+            cb = (lstrlenW(szPreload) + 1) * sizeof(WCHAR);
+            RegSetValueExW(key, szIndex, 0, REG_SZ, (LPBYTE)szPreload, cb);
+
+            RegDeleteValueW(key, szPreload2);
+        }
+    }
+
+    /* local machine */
+    {
+        MRegKey key;
+        if (key.RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"System\\CurrentControlSet\\Control\\Nls\\Language",
+                              0, KEY_WRITE) == ERROR_SUCCESS)
+        {
+            cb = (lstrlenW(szLang) + 1) * sizeof(WCHAR);
+            RegSetValueExW(key, L"Default", 0, REG_SZ, (LPBYTE)szLang, cb);
+            RegSetValueExW(key, L"InstallLanguage", 0, REG_SZ, (LPBYTE)szLang, cb);
+        }
+    }
+
+    HKL hKL = LoadKeyboardLayoutW(szPreload, KLF_ACTIVATE | KLF_UNLOADPREVIOUS);
+
+    SystemParametersInfoW(SPI_SETDEFAULTINPUTLANG,
+                          0,
+                          &hKL,
+                          0);
+
+    DWORD dwRecipients = BSM_ALLCOMPONENTS;
+    BroadcastSystemMessageW(BSF_POSTMESSAGE,
+                            &dwRecipients,
+                            WM_INPUTLANGCHANGEREQUEST,
+                            0,
+                            (LPARAM)hKL);
+
+    return TRUE;
 }
 
 extern "C"
@@ -496,8 +529,7 @@ WinMain(HINSTANCE   hInstance,
         {
             DoMakeUserJapanese(NULL);
             DoSetupSubst(JPN_MapForInstall);
-            DoSetUserKeyboard(1, 0x411, TRUE);
-            DoSetUserKeyboard(2, 0x409, FALSE);
+            DoSetUserKeyboardRegistry(1, 0x411, 0x409, TRUE);
         }
 
         DoNotepadFont(TRUE);
@@ -536,8 +568,7 @@ WinMain(HINSTANCE   hInstance,
                            MB_ICONINFORMATION | MB_YESNO) == IDYES)
             {
                 DoMakeUserEnglish(NULL);
-                DoSetUserKeyboard(1, 0x409, TRUE);
-                DoSetUserKeyboard(2, 0x411, FALSE);
+                DoSetUserKeyboardRegistry(1, 0x409, 0x411, FALSE);
             }
             else
             {
