@@ -509,7 +509,7 @@ BOOL DoSetupConsoleFonts(BOOL bInstall)
     WCHAR szText[LF_FACESIZE];
     if (key.RegOpenKeyExW(HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Console\\TrueTypeFont",
-                          0, KEY_WRITE) == ERROR_SUCCESS)
+                          0, KEY_READ | KEY_WRITE) == ERROR_SUCCESS)
     {
         if (bInstall)
         {
