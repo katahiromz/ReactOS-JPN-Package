@@ -4,7 +4,7 @@
 ##############################################################################
 
 # CMake minimum version
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.0)
 
 # project name and language
 project(jpn-setup CXX)
@@ -26,10 +26,12 @@ elseif (MSVC)
         CMAKE_C_FLAGS
         CMAKE_C_FLAGS_DEBUG
         CMAKE_C_FLAGS_RELEASE
+        CMAKE_C_FLAGS_RELMINSIZE
         CMAKE_C_FLAGS_RELWITHDEBINFO
         CMAKE_CXX_FLAGS
         CMAKE_CXX_FLAGS_DEBUG
         CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_CXX_FLAGS_RELMINSIZE
         CMAKE_CXX_FLAGS_RELWITHDEBINFO)
     foreach(CompilerFlags ${CompilerFlags})
         string(REPLACE "/MD" "/MT" ${CompilerFlags} "${${CompilerFlags}}")

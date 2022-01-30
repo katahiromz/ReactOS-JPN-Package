@@ -170,6 +170,8 @@ BOOL DoMakeUserJapanese(HWND hwnd)
         key.SetSz(L"FaceName", L"MS Gothic");
         key.SetDword(L"CodePage", 932);
     }
+
+    return TRUE;
 }
 
 BOOL DoMakeUserEnglish(HWND hwnd)
@@ -205,6 +207,8 @@ BOOL DoMakeUserEnglish(HWND hwnd)
         key.SetSz(L"FaceName", L"VGA");
         key.SetDword(L"CodePage", 437);
     }
+
+    return TRUE;
 }
 
 LONG DoSubst(MRegKey& key, const FONTSUBST *subst)
@@ -478,6 +482,9 @@ BOOL DoSetUserKeyboardRegistry(DWORD dwIndex, DWORD dwLangID, DWORD dwLangID2, B
         }
     }
 
+#ifndef KLF_UNLOADPREVIOUS
+    #define KLF_UNLOADPREVIOUS 4
+#endif
     HKL hKL = LoadKeyboardLayoutW(szPreload, KLF_ACTIVATE | KLF_UNLOADPREVIOUS);
 
     SystemParametersInfoW(SPI_SETDEFAULTINPUTLANG,
@@ -493,6 +500,44 @@ BOOL DoSetUserKeyboardRegistry(DWORD dwIndex, DWORD dwLangID, DWORD dwLangID2, B
                             (LPARAM)hKL);
 
     return TRUE;
+}
+
+BOOL DoSetupConsoleFonts(BOOL bInstall)
+{
+    MRegKey key;
+    DWORD cb;
+    WCHAR szText[LF_FACESIZE];
+    if (key.RegOpenKeyExW(HKEY_LOCAL_MACHINE,
+                          L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Console\\TrueTypeFont",
+                          0, KEY_WRITE) == ERROR_SUCCESS)
+    {
+        if (bInstall)
+        {
+            if (key.QuerySz(L"932", szText, _countof(szText)) == ERROR_SUCCESS)
+            {
+                if (lstrcmpiW(JF_LocalName2, szText) == 0)
+                    ;
+                else
+                    key.SetSz(L"932.JPN-Package-Save", szText);
+            }
+            key.SetSz(L"932", JF_LocalName2);
+        }
+        else
+        {
+            if (key.QuerySz(L"932.JPN-Package-Save", szText, _countof(szText)) == ERROR_SUCCESS)
+            {
+                key.SetSz(L"932", szText);
+                key.RegDeleteValue(L"932.JPN-Package-Save");
+            }
+            else
+            {
+                key.SetSz(L"932", JF_LocalName2);
+            }
+        }
+        return TRUE;
+    }
+
+    return FALSE;
 }
 
 extern "C"
@@ -523,16 +568,13 @@ WinMain(HINSTANCE   hInstance,
         }
 
         DoSetupSubst(NEU_MapForInstall);
-        if (IsUserJapanese() ||
-            MessageBox(NULL, LoadStringDx(104), LoadStringDx(101),
-                       MB_ICONINFORMATION | MB_YESNO) == IDYES)
-        {
-            DoMakeUserJapanese(NULL);
-            DoSetupSubst(JPN_MapForInstall);
-            DoSetUserKeyboardRegistry(1, 0x411, 0x409, TRUE);
-        }
+        DoMakeUserJapanese(NULL);
+        DoSetupSubst(JPN_MapForInstall);
+        DoSetUserKeyboardRegistry(1, 0x411, 0x409, TRUE);
 
         DoNotepadFont(TRUE);
+        DoSetupConsoleFonts(TRUE);
+
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 
         DeleteFile(DoGetDataFileName());
@@ -575,6 +617,8 @@ WinMain(HINSTANCE   hInstance,
                 DoSetupSubst(JPN_MapForUninstallWithDroid);
             }
         }
+
+        DoSetupConsoleFonts(FALSE);
 
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 
