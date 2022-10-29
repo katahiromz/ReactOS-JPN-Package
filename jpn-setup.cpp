@@ -295,110 +295,6 @@ LPVOID DoGetCustomFont(HINSTANCE hinstData, INT id, DWORD *pcbData)
 
 typedef LONG MYERROR;
 
-MYERROR DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
-{
-    return 0;
-#if 0
-    MRegKey keyFonts;
-
-    LONG n = keyFonts.RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-                                   L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts",
-                                   0,
-                                   KEY_WRITE);
-    if (n)
-    {
-        assert(0);
-        return FALSE;
-    }
-
-    TCHAR szFontFile[MAX_PATH];
-    GetWindowsDirectory(szFontFile, MAX_PATH);
-    PathAppend(szFontFile, L"Fonts");
-    PathAppend(szFontFile, pszFileName);
-
-    TCHAR szEntry[MAX_PATH];
-    lstrcpy(szEntry, pszEntry);
-    lstrcat(szEntry, L" (TrueType)");
-
-    if (bInstall)
-    {
-        RemoveFontResource(pszFileName);
-        keyFonts.RegDeleteValue(szEntry);
-
-        HINSTANCE hinstData = DoLoadJapaneseData();
-
-        DWORD cbData = 0;
-        LPVOID pvData = DoGetCustomFont(hinstData, id, &cbData);
-        if (!pvData || !cbData)
-        {
-            assert(0);
-            return 1;
-        }
-
-        TCHAR szPath[MAX_PATH];
-        GetTempPath(MAX_PATH, szPath);
-        PathAppend(szPath, L"ReactOS-JPN-Setup.tmp");
-
-        FILE *fp = _wfopen(szPath, L"wb");
-        if (!fp)
-        {
-            assert(0);
-            return 2;
-        }
-
-        int b = fwrite(pvData, cbData, 1, fp);
-        fclose(fp);
-
-        FreeLibrary(hinstData);
-
-        if (!b)
-        {
-            assert(0);
-            return 3;
-        }
-
-        CopyFile(szPath, szFontFile, FALSE);
-        DeleteFile(szPath);
-
-        if (LONG err = keyFonts.SetSz(szEntry, pszFileName))
-        {
-            assert(0);
-            return 5;
-        }
-
-        if (!AddFontResource(pszFileName))
-        {
-            assert(0);
-            return 6;
-        }
-
-        return 0;
-    }
-    else
-    {
-        RemoveFontResource(pszFileName);
-        keyFonts.RegDeleteValue(szEntry);
-        DeleteFile(szFontFile);
-        return 0;
-    }
-#endif
-}
-
-MYERROR DoInstallFonts(BOOL bInstall)
-{
-#if 0
-    MYERROR err;
-    err = DoInstallFont(L"msgothic.ttc", L"MS Gothic & MS PGothic & MS UI Gothic", 100, bInstall);
-    if (err)
-        return err;
-
-    err = DoInstallFont(L"msmincho.ttc", L"MS Mincho & MS PMincho", 101, bInstall);
-    if (err)
-        return err;
-#endif
-    return 0;
-}
-
 BOOL EnableProcessPriviledge(LPCTSTR pszSE_)
 {
     BOOL f;
@@ -563,13 +459,6 @@ WinMain(HINSTANCE   hInstance,
     if (lstrcmpiA(lpCmdLine, "/i") == 0)
     {
         // install
-        if (MYERROR err = DoInstallFonts(TRUE))
-        {
-            TCHAR szText[MAX_PATH * 2];
-            wsprintf(szText, LoadStringDx(103), err);
-            MessageBox(NULL, szText, NULL, MB_ICONERROR);
-            return -1;
-        }
 
         DoSetupSubst(NEU_MapForInstall);
         DoMakeUserJapanese(NULL);
@@ -588,13 +477,6 @@ WinMain(HINSTANCE   hInstance,
     else if (lstrcmpiA(lpCmdLine, "/u") == 0)
     {
         // uninstall
-        if (MYERROR err = DoInstallFonts(FALSE))
-        {
-            TCHAR szText[MAX_PATH * 2];
-            wsprintf(szText, LoadStringDx(103), err);
-            MessageBox(NULL, szText, NULL, MB_ICONERROR);
-            return -1;
-        }
 
         DoNotepadFont(FALSE);
 
