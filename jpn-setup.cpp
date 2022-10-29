@@ -297,6 +297,8 @@ typedef LONG MYERROR;
 
 MYERROR DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInstall)
 {
+    return 0;
+#if 0
     MRegKey keyFonts;
 
     LONG n = keyFonts.RegOpenKeyEx(HKEY_LOCAL_MACHINE,
@@ -379,10 +381,12 @@ MYERROR DoInstallFont(LPCWSTR pszFileName, LPCWSTR pszEntry, INT id, BOOL bInsta
         DeleteFile(szFontFile);
         return 0;
     }
+#endif
 }
 
 MYERROR DoInstallFonts(BOOL bInstall)
 {
+#if 0
     MYERROR err;
     err = DoInstallFont(L"msgothic.ttc", L"MS Gothic & MS PGothic & MS UI Gothic", 100, bInstall);
     if (err)
@@ -391,7 +395,7 @@ MYERROR DoInstallFonts(BOOL bInstall)
     err = DoInstallFont(L"msmincho.ttc", L"MS Mincho & MS PMincho", 101, bInstall);
     if (err)
         return err;
-
+#endif
     return 0;
 }
 

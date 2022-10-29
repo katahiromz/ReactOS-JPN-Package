@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ReactOS JPN Package"
-#define MyAppVersion "0.9-RC2"
+#define MyAppVersion "0.9.1"
 #define MyAppPublisher "Katayama Hirofumi MZ"
 #define MyAppExeName "jpn-setup.exe"
 
@@ -31,9 +31,14 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "jpn-data.dll"; DestDir: "{app}"; Flags: ignoreversion
+;Source: "jpn-data.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "eng-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
 Source: "jpn-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
+Source: "msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ƒSƒVƒbƒN"
+Source: "msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚oƒSƒVƒbƒN"
+Source: "msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "MS UI Gothic"
+Source: "msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r –¾’©"
+Source: "msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚o–¾’©"
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

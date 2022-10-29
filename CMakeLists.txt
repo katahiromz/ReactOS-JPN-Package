@@ -47,8 +47,8 @@ add_definitions(-DUNICODE -D_UNICODE)
 add_executable(jpn-setup WIN32 jpn-setup.cpp jpn-setup_res.rc)
 target_link_libraries(jpn-setup shlwapi)
 
-# jpn-data.dll
-add_library(jpn-data SHARED jpn-data.cpp jpn-data_res.rc)
-set_target_properties(jpn-data PROPERTIES PREFIX "")
+## jpn-data.dll
+#add_library(jpn-data SHARED jpn-data.cpp jpn-data_res.rc)
+#set_target_properties(jpn-data PROPERTIES PREFIX "")
 
 ##############################################################################
