@@ -9,8 +9,6 @@
     #define ARRAYSIZE(array) (sizeof(array) / sizeof(array[0]))
 #endif
 
-#define DATA_FILE_NAME TEXT("jpn-data.dll")
-
 LPTSTR LoadStringDx(INT nID)
 {
     static UINT s_index = 0;
@@ -98,20 +96,6 @@ static const FONTSUBST JPN_MapForUninstallWithDroid[] =
     { L"System",          L"Droid Sans Fallback" },
     { L"Tahoma",          L"Droid Sans Fallback" },
 };
-
-LPCWSTR DoGetDataFileName(void)
-{
-    static TCHAR szPath[MAX_PATH];
-    GetModuleFileName(NULL, szPath, ARRAYSIZE(szPath));
-    PathRemoveFileSpec(szPath);
-    PathAppend(szPath, DATA_FILE_NAME);
-    return szPath;
-}
-
-HINSTANCE DoLoadJapaneseData(VOID)
-{
-    return LoadLibraryEx(DoGetDataFileName(), NULL, LOAD_LIBRARY_AS_DATAFILE);
-}
 
 // NtSetDefaultLocale
 typedef LONG (WINAPI *NTSETDEFAULTLOCALE)(BOOLEAN, LCID);
@@ -456,10 +440,8 @@ WinMain(HINSTANCE   hInstance,
         return -1;
     }
 
-    if (lstrcmpiA(lpCmdLine, "/i") == 0)
+    if (lstrcmpiA(lpCmdLine, "/i") == 0) // install
     {
-        // install
-
         DoSetupSubst(NEU_MapForInstall);
         DoMakeUserJapanese(NULL);
         DoSetupSubst(JPN_MapForInstall);
@@ -470,14 +452,10 @@ WinMain(HINSTANCE   hInstance,
 
         SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 
-        DeleteFile(DoGetDataFileName());
-
         return 0;
     }
-    else if (lstrcmpiA(lpCmdLine, "/u") == 0)
+    else if (lstrcmpiA(lpCmdLine, "/u") == 0) // uninstall
     {
-        // uninstall
-
         DoNotepadFont(FALSE);
 
         if (IsThereDroidFont())
