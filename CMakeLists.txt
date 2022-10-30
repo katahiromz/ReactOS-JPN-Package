@@ -6,12 +6,15 @@
 # CMake minimum version
 cmake_minimum_required(VERSION 3.0)
 
-# project name and language
-project(jpn-setup CXX)
+# project name and languages
+project(jpn-setup CXX RC)
 
-# enable Win32 resource
-enable_language(RC)
+# set output directory (build/)
+set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
+# statically linked
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     # using Clang
     set(CMAKE_C_FLAGS "-static")
@@ -46,5 +49,8 @@ add_definitions(-DUNICODE -D_UNICODE)
 # jpn-setup.exe
 add_executable(jpn-setup WIN32 jpn-setup.cpp jpn-setup_res.rc)
 target_link_libraries(jpn-setup shlwapi)
+
+# submodule mzimeja
+add_subdirectory(mzimeja)
 
 ##############################################################################
