@@ -31,7 +31,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-;Source: "jpn-data.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "eng-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
 Source: "jpn-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
 Source: "msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "ÇlÇr ÉSÉVÉbÉN"
