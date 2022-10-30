@@ -29,8 +29,8 @@ AlwaysRestart=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Components]
-Name: ime; Description: "Install Japanese IME"; Flags: restart; Types: full
 Name: fonts; Description: "Install Japanese fonts"; Flags: restart; Types: full
+Name: ime; Description: "Install Japanese IME (Not recommended)"; Flags: restart; Types: full
 
 [Files]
 Source: "build\Release\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
