@@ -423,6 +423,12 @@ BOOL DoSetupConsoleFonts(BOOL bInstall)
     return FALSE;
 }
 
+BOOL IsReactOS(VOID)
+{
+    MRegKey key;
+    return key.RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"Software\\ReactOS") == ERROR_SUCCESS;
+}
+
 extern "C"
 INT WINAPI
 WinMain(HINSTANCE   hInstance,
@@ -430,10 +436,7 @@ WinMain(HINSTANCE   hInstance,
         LPSTR       lpCmdLine,
         INT         nCmdShow)
 {
-    // check windows directory
-    TCHAR szWinDir[MAX_PATH];
-    GetWindowsDirectory(szWinDir, ARRAYSIZE(szWinDir));
-    if (wcsstr(szWinDir, L"ReactOS") == NULL)
+    if (!IsReactOS())
     {
         MessageBox(NULL, LoadStringDx(102), NULL, MB_ICONERROR);
         return -1;
