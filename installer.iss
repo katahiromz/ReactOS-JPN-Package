@@ -23,6 +23,7 @@ OutputBaseFilename=reactos-jpn-setup-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
 UninstallRestartComputer=yes
+AlwaysRestart=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
