@@ -389,7 +389,6 @@ BOOL DoSetUserKeyboardRegistry(DWORD dwIndex, DWORD dwLangID, DWORD dwLangID2, B
 BOOL DoSetupConsoleFonts(BOOL bInstall)
 {
     MRegKey key;
-    DWORD cb;
     WCHAR szText[LF_FACESIZE];
     if (key.RegOpenKeyExW(HKEY_LOCAL_MACHINE,
                           L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Console\\TrueTypeFont",
