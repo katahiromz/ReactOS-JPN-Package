@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ReactOS JPN Package"
-#define MyAppVersion "0.9.1"
+#define MyAppVersion "0.9.2"
 #define MyAppPublisher "Katayama Hirofumi MZ"
 
 [Setup]
@@ -22,7 +22,6 @@ OutputDir=.
 OutputBaseFilename=reactos-jpn-setup-{#MyAppVersion}
 Compression=lzma
 SolidCompression=yes
-AlwaysRestart=yes
 UninstallRestartComputer=yes
 
 [Languages]
