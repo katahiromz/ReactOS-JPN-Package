@@ -4,7 +4,7 @@
 #define MyAppName "ReactOS JPN Package"
 #define MyAppVersion "0.9.1"
 #define MyAppPublisher "Katayama Hirofumi MZ"
-#define MyAppExeName "jpn-setup.exe"
+#define MyAppExeName "font_setup.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.

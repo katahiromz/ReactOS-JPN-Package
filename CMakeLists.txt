@@ -46,9 +46,9 @@ endif()
 # support Unicode
 add_definitions(-DUNICODE -D_UNICODE)
 
-# jpn-setup.exe
-add_executable(jpn-setup WIN32 jpn-setup.cpp jpn-setup_res.rc)
-target_link_libraries(jpn-setup shlwapi)
+# font_setup.exe
+add_executable(font_setup WIN32 font_setup.cpp font_setup_res.rc)
+target_link_libraries(font_setup shlwapi)
 
 # submodule mzimeja
 add_subdirectory(mzimeja)
