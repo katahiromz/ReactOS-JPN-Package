@@ -28,24 +28,28 @@ AlwaysRestart=yes
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[Components]
+Name: ime; Description: "Install Japanese IME"; Flags: restart; Types: full
+Name: fonts; Description: "Install Japanese fonts"; Flags: restart; Types: full
+
 [Files]
-Source: "build\Release\font_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Release\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "reg\eng-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
-Source: "reg\jpn-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
-Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ƒSƒVƒbƒN"
-Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚oƒSƒVƒbƒN"
-Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "MS UI Gothic"
-Source: "fonts\msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r –¾’©"
-Source: "fonts\msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚o–¾’©"
-Source: "mzimeja\res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "mzimeja\res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "mzimeja\res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
-Source: "mzimeja\res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "build\Release\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "mzimeja\res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
+Source: "mzimeja\res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
+Source: "mzimeja\res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
+Source: "mzimeja\res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
+Source: "build\Release\font_setup.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: fonts
+Source: "reg\eng-locale.reg"; DestDir: "{app}"; Flags: ignoreversion; Components: fonts
+Source: "reg\jpn-locale.reg"; DestDir: "{app}"; Flags: ignoreversion; Components: fonts
+Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ƒSƒVƒbƒN"; Components: fonts
+Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚oƒSƒVƒbƒN"; Components: fonts
+Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "MS UI Gothic"; Components: fonts
+Source: "fonts\msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r –¾’©"; Components: fonts
+Source: "fonts\msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚o–¾’©"; Components: fonts
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
@@ -53,9 +57,9 @@ Source: "mzimeja\res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\font_setup.exe"; Parameters: "/i"
-Filename: "{app}\ime_setup.exe"; Parameters: "/i"
+Filename: "{app}\font_setup.exe"; Parameters: "/i"; Components: fonts
+Filename: "{app}\ime_setup.exe"; Parameters: "/i"; Components: ime
 
 [UninstallRun]
-Filename: "{app}\font_setup.exe"; Parameters: "/u"
-Filename: "{app}\ime_setup.exe"; Parameters: "/u"
+Filename: "{app}\font_setup.exe"; Parameters: "/u"; Components: fonts
+Filename: "{app}\ime_setup.exe"; Parameters: "/u"; Components: ime
