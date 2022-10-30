@@ -4,7 +4,6 @@
 #define MyAppName "ReactOS JPN Package"
 #define MyAppVersion "0.9.1"
 #define MyAppPublisher "Katayama Hirofumi MZ"
-#define MyAppExeName "font_setup.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
@@ -30,14 +29,23 @@ UninstallRestartComputer=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
-Source: "eng-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
-Source: "jpn-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
-Source: "msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ƒSƒVƒbƒN"
-Source: "msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚oƒSƒVƒbƒN"
-Source: "msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "MS UI Gothic"
-Source: "msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r –¾’©"
-Source: "msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚o–¾’©"
+Source: "build\Release\font_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "reg\eng-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
+Source: "reg\jpn-locale.reg"; DestDir: "{app}"; Flags: ignoreversion
+Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ƒSƒVƒbƒN"
+Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚oƒSƒVƒbƒN"
+Source: "fonts\msgothic.ttc"; DestDir: "{fonts}"; FontInstall: "MS UI Gothic"
+Source: "fonts\msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r –¾’©"
+Source: "fonts\msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚o–¾’©"
+Source: "mzimeja\res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "mzimeja\res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "mzimeja\res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion
+Source: "mzimeja\res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
@@ -45,7 +53,9 @@ Source: "msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚o–¾’©"
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
-Filename: "{app}\{#MyAppExeName}"; Parameters: "/i"
+Filename: "{app}\font_setup.exe"; Parameters: "/i"
+Filename: "{app}\ime_setup.exe"; Parameters: "/i"
 
 [UninstallRun]
-Filename: "{app}\{#MyAppExeName}"; Parameters: "/u"
+Filename: "{app}\font_setup.exe"; Parameters: "/u"
+Filename: "{app}\ime_setup.exe"; Parameters: "/u"
