@@ -308,14 +308,32 @@ BOOL IsUserJapanese(void)
     return PRIMARYLANGID(GetUserDefaultLangID()) == LANG_JAPANESE;
 }
 
+LPTSTR GetDroidFontPath(VOID)
+{
+    static TCHAR s_szPath[MAX_PATH];
+    GetWindowsDirectory(s_szPath, MAX_PATH);
+    PathAppend(s_szPath, L"Fonts");
+    PathAppend(s_szPath, L"DroidSansFallback.ttf");
+    return s_szPath;
+}
+
 BOOL IsThereDroidFont(void)
 {
-    TCHAR szFontFile[MAX_PATH];
-    GetWindowsDirectory(szFontFile, MAX_PATH);
-    PathAppend(szFontFile, L"Fonts");
-    PathAppend(szFontFile, L"DroidSansFallback.ttf");
+    return PathFileExists(GetDroidFontPath());
+}
 
-    return PathFileExists(szFontFile);
+LPTSTR GetDroidFontBackupPath(VOID)
+{
+    static TCHAR s_szPath[MAX_PATH];
+    GetWindowsDirectory(s_szPath, MAX_PATH);
+    PathAppend(s_szPath, L"Fonts");
+    PathAppend(s_szPath, L"DroidSansFallback.ttf.backup");
+    return s_szPath;
+}
+
+BOOL IsThereDroidFontBackup(void)
+{
+    return PathFileExists(GetDroidFontBackupPath());
 }
 
 BOOL DoSetUserKeyboardRegistry(DWORD dwIndex, DWORD dwLangID, DWORD dwLangID2, BOOL bInstall)
@@ -452,7 +470,13 @@ WinMain(HINSTANCE   hInstance,
         DoNotepadFont(TRUE);
         DoSetupConsoleFonts(TRUE);
 
-        SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
+        if (IsThereDroidFont())
+        {
+            MoveFileEx(GetDroidFontPath(), GetDroidFontBackupPath(),
+                       MOVEFILE_DELAY_UNTIL_REBOOT);
+        }
+
+        //SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 
         return 0;
     }
@@ -486,7 +510,13 @@ WinMain(HINSTANCE   hInstance,
 
         DoSetupConsoleFonts(FALSE);
 
-        SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
+        if (IsThereDroidFontBackup())
+        {
+            MoveFileEx(GetDroidFontBackupPath(), GetDroidFontPath(),
+                       MOVEFILE_DELAY_UNTIL_REBOOT);
+        }
+
+        //SendMessage(HWND_BROADCAST, WM_FONTCHANGE, 0, 0);
 
         return 0;
     }
