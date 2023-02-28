@@ -116,8 +116,13 @@ void DoSetLocale(BOOLEAN b, LCID lcid, LPCWSTR pszACP, LPCWSTR pszOEMCP)
     RegOpenKeyW(HKEY_LOCAL_MACHINE,
                 L"SYSTEM\\CurrentControlSet\\Control\\NLS\\CodePage",
                 &hLangKey);
-    RegSetValueExW(hLangKey, L"ACP", 0, REG_SZ, (BYTE *)pszACP, (wcslen(pszACP) + 1) * sizeof(WCHAR));
-    RegSetValueExW(hLangKey, L"OEMCP", 0, REG_SZ, (BYTE *)pszOEMCP, (wcslen(pszOEMCP) + 1) * sizeof(WCHAR));
+
+    DWORD cb1 = DWORD((wcslen(pszACP) + 1) * sizeof(WCHAR));
+    RegSetValueExW(hLangKey, L"ACP", 0, REG_SZ, (BYTE *)pszACP, cb1);
+
+    DWORD cb2 = DWORD((wcslen(pszOEMCP) + 1) * sizeof(WCHAR));
+    RegSetValueExW(hLangKey, L"OEMCP", 0, REG_SZ, (BYTE *)pszOEMCP, cb2);
+
     RegCloseKey(hLangKey);
 }
 
