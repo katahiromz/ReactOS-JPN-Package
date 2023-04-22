@@ -38,6 +38,9 @@ Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion; Com
 Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
 Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
 Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "mzimeja\READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "mzimeja\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "mzimeja\HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mzimeja\res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
@@ -54,6 +57,9 @@ Source: "fonts\msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚o–¾’©"; Co
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
+Name: "{group}\READMEJP.txt"; Filename: "{app}\READMEJP.txt"
+Name: "{group}\LICENSE.txt"; Filename: "{app}\LICENSE.txt"
+Name: "{group}\HISTORY.txt"; Filename: "{app}\HISTORY.txt"
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
