@@ -39,7 +39,7 @@ Source: "build\Debug\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion; Compon
 Source: "build\Debug\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
 Source: "build\Debug\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "mzimeja\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mzimeja\HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mzimeja\res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
