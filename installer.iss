@@ -41,7 +41,7 @@ Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion; Com
 Source: "mzimeja\READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mzimeja\HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "mzimeja\res\mzimeja.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
+Source: "mzimeja\res\basic.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\res\radical.dat"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
