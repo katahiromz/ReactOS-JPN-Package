@@ -139,20 +139,20 @@ BOOL DoMakeUserJapanese(HWND hwnd)
     {
         keyConsole.SetSz(L"FaceName", L"MS Gothic");
         keyConsole.SetDword(L"CodePage", 932);
-    }
 
-    for (DWORD dwIndex = 0; ; ++dwIndex)
-    {
-        WCHAR szName[MAX_PATH];
-        DWORD cchName = ARRAYSIZE(szName);
-        if (keyConsole.RegEnumKeyEx(dwIndex, szName, &cchName) != ERROR_SUCCESS)
-            break;
-
-        MRegKey key;
-        if (key.RegOpenKeyEx(keyConsole, szName, 0, KEY_WRITE) == NOERROR)
+        for (DWORD dwIndex = 0; ; ++dwIndex)
         {
-            key.SetSz(L"FaceName", L"MS Gothic");
-            key.SetDword(L"CodePage", 932);
+            WCHAR szName[MAX_PATH];
+            DWORD cchName = ARRAYSIZE(szName);
+            if (keyConsole.RegEnumKeyEx(dwIndex, szName, &cchName) != ERROR_SUCCESS)
+                break;
+
+            MRegKey key;
+            if (key.RegOpenKeyEx(keyConsole, szName, 0, KEY_WRITE) == NOERROR)
+            {
+                key.SetSz(L"FaceName", L"MS Gothic");
+                key.SetDword(L"CodePage", 932);
+            }
         }
     }
 
@@ -180,20 +180,20 @@ BOOL DoMakeUserEnglish(HWND hwnd)
     {
         keyConsole.SetSz(L"FaceName", L"VGA");
         keyConsole.SetDword(L"CodePage", 437);
-    }
 
-    for (DWORD dwIndex = 0; ; ++dwIndex)
-    {
-        WCHAR szName[MAX_PATH];
-        DWORD cchName = ARRAYSIZE(szName);
-        if (keyConsole.RegEnumKeyEx(dwIndex, szName, &cchName) != ERROR_SUCCESS)
-            break;
-
-        MRegKey key;
-        if (key.RegOpenKeyEx(keyConsole, szName, 0, KEY_WRITE) == NOERROR)
+        for (DWORD dwIndex = 0; ; ++dwIndex)
         {
-            key.SetSz(L"FaceName", L"VGA");
-            key.SetDword(L"CodePage", 437);
+            WCHAR szName[MAX_PATH];
+            DWORD cchName = ARRAYSIZE(szName);
+            if (keyConsole.RegEnumKeyEx(dwIndex, szName, &cchName) != ERROR_SUCCESS)
+                break;
+
+            MRegKey key;
+            if (key.RegOpenKeyEx(keyConsole, szName, 0, KEY_WRITE) == NOERROR)
+            {
+                key.SetSz(L"FaceName", L"VGA");
+                key.SetDword(L"CodePage", 437);
+            }
         }
     }
 
