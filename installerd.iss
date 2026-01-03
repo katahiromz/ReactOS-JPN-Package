@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ReactOS JPN Package"
-#define MyAppVersion "0.9.9.1"
+#define MyAppVersion "1.0.0.2"
 #define MyAppPublisher "Katayama Hirofumi MZ"
 
 [Setup]

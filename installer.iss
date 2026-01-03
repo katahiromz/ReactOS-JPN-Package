@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ReactOS JPN Package"
-#define MyAppVersion "0.9.9.1"
+#define MyAppVersion "1.0.0.2"
 #define MyAppPublisher "Katayama Hirofumi MZ"
 
 [Setup]
@@ -40,7 +40,7 @@ Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
-Source: "mzimeja\HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "mzimeja\ChangeLog.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mzimeja\res\basic.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\res\name.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\res\kanji.dat"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
@@ -59,7 +59,7 @@ Source: "fonts\msmincho.ttc"; DestDir: "{fonts}"; FontInstall: "‚l‚r ‚o–¾’©"; Co
 [Icons]
 Name: "{group}\READMEJP.txt"; Filename: "{app}\READMEJP.txt"
 Name: "{group}\LICENSE.txt"; Filename: "{app}\LICENSE.txt"
-Name: "{group}\HISTORY.txt"; Filename: "{app}\HISTORY.txt"
+Name: "{group}\ChangeLog.txt"; Filename: "{app}\ChangeLog.txt"
 Name: "{group}\Uninstall"; Filename: "{uninstallexe}"
 
 [Run]
