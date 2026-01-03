@@ -33,11 +33,11 @@ Name: fonts; Description: "Install Japanese fonts"; Flags: restart; Types: full
 Name: ime; Description: "Install Japanese IME"; Flags: restart; Types: full
 
 [Files]
-Source: "build\Release\ime_setup.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
-Source: "build\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
-Source: "build\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
-Source: "build\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
-Source: "build\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build32\Release\ime_setup32.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build32\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build32\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build32\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
+Source: "build32\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
 Source: "mzimeja\READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mzimeja\ChangeLog.txt"; DestDir: "{app}"; Flags: ignoreversion
