@@ -38,7 +38,7 @@ Source: "build32\Release\mzimeja.ime"; DestDir: "{app}"; Flags: ignoreversion; C
 Source: "build32\Release\imepad.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
 Source: "build32\Release\dict_compile.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
 Source: "build32\Release\verinfo.exe"; DestDir: "{app}"; Flags: ignoreversion; Components: ime
-Source: "mzimeja\READMEJP.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "mzimeja\README_ja.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mzimeja\ChangeLog.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "mzimeja\res\basic.dic"; DestDir: "{app}\res"; Flags: ignoreversion; Components: ime
